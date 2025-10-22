@@ -1,0 +1,9 @@
+# ملفات لا نحتاجها في Render
+node_modules/
+.git/
+.env
+*.log
+.DS_Store
+coverage/
+.vscode/
+.idea/
