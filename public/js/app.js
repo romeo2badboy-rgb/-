@@ -4,22 +4,141 @@ const API_BASE = '/api';
 // الحالة العامة للتطبيق
 const appState = {
     currentPage: 'dashboard',
-    data: {}
+    data: {},
+    user: null,
+    isAuthenticated: false
 };
 
 // عناصر DOM
-const content = document.getElementById('content');
-const pageTitle = document.getElementById('page-title');
-const modal = document.getElementById('modal');
-const modalBody = document.getElementById('modal-body');
-const closeModal = document.querySelector('.close');
+let content, pageTitle, modal, modalBody, closeModal;
+
+// ===========================================
+// نظام المصادقة - Authentication
+// ===========================================
+function checkAuth() {
+    const user = localStorage.getItem('user');
+    if (user) {
+        appState.user = JSON.parse(user);
+        appState.isAuthenticated = true;
+        return true;
+    }
+    return false;
+}
+
+function login(username, password) {
+    return new Promise((resolve, reject) => {
+        // محاكاة استدعاء API
+        setTimeout(() => {
+            if (username === 'admin' && password === 'admin123') {
+                const user = {
+                    id: 1,
+                    username: 'admin',
+                    fullName: 'المدير',
+                    role: 'admin'
+                };
+                localStorage.setItem('user', JSON.stringify(user));
+                appState.user = user;
+                appState.isAuthenticated = true;
+                resolve(user);
+            } else {
+                reject(new Error('اسم المستخدم أو كلمة المرور غير صحيحة'));
+            }
+        }, 1000);
+    });
+}
+
+function logout() {
+    localStorage.removeItem('user');
+    appState.user = null;
+    appState.isAuthenticated = false;
+    showLoginScreen();
+}
+
+function showLoginScreen() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+}
+
+function showMainApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'flex';
+}
+
+function initLoginForm() {
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const btnText = document.querySelector('.btn-text');
+    const btnLoader = document.querySelector('.btn-loader');
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // إخفاء رسالة الخطأ
+        loginError.style.display = 'none';
+
+        // إظهار loader
+        btnText.style.display = 'none';
+        btnLoader.style.display = 'inline-block';
+
+        try {
+            await login(username, password);
+
+            // إخفاء شاشة login مع أنيميشن
+            const loginCard = document.querySelector('.login-card');
+            loginCard.style.animation = 'scaleUp 0.5s ease reverse';
+
+            setTimeout(() => {
+                showMainApp();
+                initApp();
+                loadPage('dashboard');
+            }, 500);
+        } catch (error) {
+            loginError.textContent = error.message;
+            loginError.style.display = 'block';
+            btnText.style.display = 'inline';
+            btnLoader.style.display = 'none';
+        }
+    });
+}
 
 // تهيئة التطبيق
 document.addEventListener('DOMContentLoaded', () => {
-    loadPage('dashboard');
+    // تحقق من المصادقة
+    if (checkAuth()) {
+        showMainApp();
+        initApp();
+        loadPage('dashboard');
+    } else {
+        showLoginScreen();
+    }
+
+    initLoginForm();
+});
+
+function initApp() {
+    // تهيئة عناصر DOM
+    content = document.getElementById('content');
+    pageTitle = document.getElementById('page-title');
+    modal = document.getElementById('modal');
+    modalBody = document.getElementById('modal-body');
+    closeModal = document.querySelector('.close');
+
     initNavigation();
     initModal();
-});
+    updateUserInfo();
+}
+
+function updateUserInfo() {
+    if (appState.user) {
+        const userInfo = document.querySelector('.user-info span');
+        if (userInfo) {
+            userInfo.textContent = `مرحباً، ${appState.user.fullName}`;
+        }
+    }
+}
 
 // التنقل
 function initNavigation() {
@@ -92,34 +211,34 @@ async function loadDashboard() {
 
     content.innerHTML = `
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card stagger-item glow-on-hover">
                 <h3>إجمالي المبيعات</h3>
                 <div class="value">${formatCurrency(stats.sales.total_revenue || 0)}</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card stagger-item glow-on-hover">
                 <h3>عدد الطلبات</h3>
                 <div class="value">${stats.sales.total_orders || 0}</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card stagger-item glow-on-hover">
                 <h3>عدد العملاء</h3>
                 <div class="value">${stats.customers || 0}</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card stagger-item glow-on-hover">
                 <h3>عدد المنتجات</h3>
                 <div class="value">${stats.products || 0}</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card stagger-item glow-on-hover">
                 <h3>منتجات منخفضة المخزون</h3>
                 <div class="value" style="color: #dc3545">${stats.lowStockProducts || 0}</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card stagger-item glow-on-hover">
                 <h3>الفواتير المعلقة</h3>
                 <div class="value" style="color: #ffc107">${stats.pendingInvoices.count || 0}</div>
             </div>
         </div>
 
         <div class="stats-grid">
-            <div class="table-container">
+            <div class="table-container flip-in">
                 <div class="table-header">
                     <h2>أفضل المنتجات مبيعاً</h2>
                 </div>
@@ -132,8 +251,8 @@ async function loadDashboard() {
                         </tr>
                     </thead>
                     <tbody>
-                        ${stats.topProducts.map(p => `
-                            <tr>
+                        ${stats.topProducts.map((p, i) => `
+                            <tr class="stagger-item" style="animation-delay: ${0.7 + (i * 0.1)}s">
                                 <td>${p.name}</td>
                                 <td>${p.total_sold}</td>
                                 <td>${formatCurrency(p.revenue)}</td>
@@ -143,7 +262,7 @@ async function loadDashboard() {
                 </table>
             </div>
 
-            <div class="table-container">
+            <div class="table-container flip-in" style="animation-delay: 0.2s">
                 <div class="table-header">
                     <h2>أفضل العملاء</h2>
                 </div>
@@ -156,8 +275,8 @@ async function loadDashboard() {
                         </tr>
                     </thead>
                     <tbody>
-                        ${stats.topCustomers.map(c => `
-                            <tr>
+                        ${stats.topCustomers.map((c, i) => `
+                            <tr class="stagger-item" style="animation-delay: ${0.7 + (i * 0.1)}s">
                                 <td>${c.name}</td>
                                 <td>${c.order_count}</td>
                                 <td>${formatCurrency(c.total_spent)}</td>
@@ -1130,7 +1249,7 @@ function initModal() {
 
 function showAlert(message, type) {
     const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type}`;
+    alertDiv.className = `alert alert-${type} notification-pop`;
     alertDiv.textContent = message;
     alertDiv.style.position = 'fixed';
     alertDiv.style.top = '20px';
@@ -1142,6 +1261,7 @@ function showAlert(message, type) {
     document.body.appendChild(alertDiv);
 
     setTimeout(() => {
-        alertDiv.remove();
+        alertDiv.style.animation = 'slideInUp 0.3s ease reverse';
+        setTimeout(() => alertDiv.remove(), 300);
     }, 3000);
 }
