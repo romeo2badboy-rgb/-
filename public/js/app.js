@@ -180,7 +180,7 @@ async function loadCustomers() {
         <div class="table-container">
             <div class="table-header">
                 <h2>قائمة العملاء</h2>
-                <button class="btn btn-primary" onclick="showCustomerForm()">➕ إضافة عميل جديد</button>
+                <button class="btn btn-primary" onclick="showCustomerForm()">إضافة عميل جديد</button>
             </div>
             <div class="search-bar">
                 <input type="text" placeholder="بحث عن عميل..." onkeyup="searchCustomers(this.value)">
@@ -329,7 +329,7 @@ async function loadProducts() {
         <div class="table-container">
             <div class="table-header">
                 <h2>قائمة المنتجات</h2>
-                <button class="btn btn-primary" onclick="showProductForm()">➕ إضافة منتج جديد</button>
+                <button class="btn btn-primary" onclick="showProductForm()">إضافة منتج جديد</button>
             </div>
             <div class="search-bar">
                 <input type="text" placeholder="بحث عن منتج..." onkeyup="searchProducts(this.value)">
@@ -500,7 +500,7 @@ async function loadOrders() {
         <div class="table-container">
             <div class="table-header">
                 <h2>قائمة الطلبات</h2>
-                <button class="btn btn-primary" onclick="showOrderForm()">➕ إنشاء طلب جديد</button>
+                <button class="btn btn-primary" onclick="showOrderForm()">إنشاء طلب جديد</button>
             </div>
             <table>
                 <thead>
@@ -561,7 +561,7 @@ async function showOrderForm() {
                         <input type="number" name="unit_price[]" placeholder="السعر" step="0.01" required style="width: 30%; display: inline-block;">
                     </div>
                 </div>
-                <button type="button" class="btn btn-success btn-sm" onclick="addOrderItem()">➕ إضافة منتج</button>
+                <button type="button" class="btn btn-success btn-sm" onclick="addOrderItem()">إضافة منتج</button>
             </div>
             <div class="form-group">
                 <label>الخصم</label>
@@ -971,7 +971,7 @@ async function loadCategories() {
         <div class="table-container">
             <div class="table-header">
                 <h2>قائمة الفئات</h2>
-                <button class="btn btn-primary" onclick="showCategoryForm()">➕ إضافة فئة جديدة</button>
+                <button class="btn btn-primary" onclick="showCategoryForm()">إضافة فئة جديدة</button>
             </div>
             <table>
                 <thead>
