@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المبيعات - Sales Management System</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- الشريط الجانبي -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>📊 نظام المبيعات</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <span class="icon">🏠</span>
+                    <span>لوحة التحكم</span>
+                </a>
+                <a href="#" class="nav-item" data-page="customers">
+                    <span class="icon">👥</span>
+                    <span>العملاء</span>
+                </a>
+                <a href="#" class="nav-item" data-page="products">
+                    <span class="icon">📦</span>
+                    <span>المنتجات</span>
+                </a>
+                <a href="#" class="nav-item" data-page="orders">
+                    <span class="icon">🛒</span>
+                    <span>الطلبات</span>
+                </a>
+                <a href="#" class="nav-item" data-page="invoices">
+                    <span class="icon">🧾</span>
+                    <span>الفواتير</span>
+                </a>
+                <a href="#" class="nav-item" data-page="reports">
+                    <span class="icon">📈</span>
+                    <span>التقارير</span>
+                </a>
+                <a href="#" class="nav-item" data-page="categories">
+                    <span class="icon">📑</span>
+                    <span>الفئات</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="page-title">لوحة التحكم</h1>
+                <div class="user-info">
+                    <span>مرحباً، المدير</span>
+                </div>
+            </header>
+
+            <div id="content" class="content">
+                <!-- سيتم تحميل المحتوى هنا -->
+            </div>
+        </main>
+    </div>
+
+    <!-- نافذة منبثقة للإضافة/التعديل -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
