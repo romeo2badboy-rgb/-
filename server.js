@@ -22,6 +22,7 @@ app.use('/api/invoices', require('./routes/invoices'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/ai', require('./routes/ai'));
+app.use('/api/browsing', require('./routes/browsing'));
 
 // الصفحة الرئيسية
 app.get('/', (req, res) => {
