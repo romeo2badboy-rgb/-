@@ -191,6 +191,15 @@ router.get('/html', async (req, res) => {
     }
 });
 
+// Get browser status
+router.get('/status', (req, res) => {
+    res.json({
+        success: true,
+        isActive: browserManager.isActive,
+        message: browserManager.isActive ? 'المتصفح نشط' : 'المتصفح متوقف'
+    });
+});
+
 // SSE endpoint for real-time updates
 router.get('/stream', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
@@ -202,17 +211,20 @@ router.get('/stream', (req, res) => {
     const onAction = (data) => res.write(`event: action\ndata: ${JSON.stringify(data)}\n\n`);
     const onSuccess = (data) => res.write(`event: success\ndata: ${JSON.stringify(data)}\n\n`);
     const onProgress = (data) => res.write(`event: progress\ndata: ${JSON.stringify(data)}\n\n`);
+    const onError = (data) => res.write(`event: error\ndata: ${JSON.stringify(data)}\n\n`);
 
     browserManager.on('status', onStatus);
     browserManager.on('action', onAction);
     browserManager.on('success', onSuccess);
     browserManager.on('progress', onProgress);
+    browserManager.on('error', onError);
 
     req.on('close', () => {
         browserManager.off('status', onStatus);
         browserManager.off('action', onAction);
         browserManager.off('success', onSuccess);
         browserManager.off('progress', onProgress);
+        browserManager.off('error', onError);
     });
 });
 

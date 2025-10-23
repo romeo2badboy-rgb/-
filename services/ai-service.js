@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const db = require('../config/database');
 
-// Initialize Gemini AI with 2.5 Flash
+// Initialize Gemini AI with 2.0 Flash (Latest available model)
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'AIzaSyDgRQ4rATcxVXOjUUS18UjsweGoLEGMSyQ');
 
 // Define comprehensive AI tools for COMPLETE site control - 47 TOOLS
@@ -1684,7 +1684,7 @@ async function executeFunction(functionName, args) {
 async function chat(message, conversationHistory = []) {
     try {
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.5-flash',  // 🔥 UPGRADED TO 2.5 FLASH
+            model: 'gemini-2.0-flash-exp',  // Latest Gemini 2.0 Flash model
             tools: [{
                 functionDeclarations: tools
             }],
