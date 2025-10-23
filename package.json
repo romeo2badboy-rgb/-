@@ -14,18 +14,25 @@
     "node": ">=14.0.0",
     "npm": ">=6.0.0"
   },
-  "keywords": ["sales", "management", "crm", "inventory", "invoicing"],
+  "keywords": [
+    "sales",
+    "management",
+    "crm",
+    "inventory",
+    "invoicing"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "sqlite3": "^5.1.6",
+    "@google/generative-ai": "^0.24.1",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "uuid": "^9.0.0",
-    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
-    "dotenv": "^16.3.1"
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
