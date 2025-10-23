@@ -4,9 +4,67 @@ const db = require('../config/database');
 // Initialize Gemini AI with 2.5 Flash
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'AIzaSyDgRQ4rATcxVXOjUUS18UjsweGoLEGMSyQ');
 
-// Define comprehensive AI tools for COMPLETE site control
+// Define comprehensive AI tools for COMPLETE site control - 47 TOOLS
 const tools = [
-    // ========== CUSTOMER MANAGEMENT ==========
+    // ==========================================
+    // 1️⃣ CATEGORIES MANAGEMENT (5 tools)
+    // ==========================================
+    {
+        name: 'addCategory',
+        description: 'إضافة فئة منتجات جديدة',
+        parameters: {
+            type: 'object',
+            properties: {
+                name: { type: 'string', description: 'اسم الفئة' },
+                description: { type: 'string', description: 'وصف الفئة' }
+            },
+            required: ['name']
+        }
+    },
+    {
+        name: 'updateCategory',
+        description: 'تحديث فئة موجودة',
+        parameters: {
+            type: 'object',
+            properties: {
+                id: { type: 'number', description: 'رقم الفئة' },
+                name: { type: 'string', description: 'الاسم الجديد' },
+                description: { type: 'string', description: 'الوصف الجديد' }
+            },
+            required: ['id']
+        }
+    },
+    {
+        name: 'deleteCategory',
+        description: 'حذف فئة (مع تحذير بشأن المنتجات المرتبطة)',
+        parameters: {
+            type: 'object',
+            properties: {
+                id: { type: 'number', description: 'رقم الفئة المراد حذفها' }
+            },
+            required: ['id']
+        }
+    },
+    {
+        name: 'getCategories',
+        description: 'عرض جميع الفئات مع عدد المنتجات',
+        parameters: { type: 'object', properties: {} }
+    },
+    {
+        name: 'getProductsByCategory',
+        description: 'عرض المنتجات ضمن فئة معينة',
+        parameters: {
+            type: 'object',
+            properties: {
+                category_id: { type: 'number', description: 'رقم الفئة' }
+            },
+            required: ['category_id']
+        }
+    },
+
+    // ==========================================
+    // 2️⃣ CUSTOMER MANAGEMENT (6 tools)
+    // ==========================================
     {
         name: 'addCustomer',
         description: 'إضافة عميل جديد إلى قاعدة البيانات',
@@ -296,6 +354,222 @@ const tools = [
             type: 'object',
             properties: {
                 limit: { type: 'number', description: 'عدد العملاء المراد عرضهم (افتراضياً 10)' }
+            }
+        }
+    },
+
+    // ========== USER MANAGEMENT (5 tools) ==========
+    {
+        name: 'addUser',
+        description: 'إضافة مستخدم جديد للنظام (موظف/مدير)',
+        parameters: {
+            type: 'object',
+            properties: {
+                username: { type: 'string', description: 'اسم المستخدم' },
+                full_name: { type: 'string', description: 'الاسم الكامل' },
+                email: { type: 'string', description: 'البريد الإلكتروني' },
+                password: { type: 'string', description: 'كلمة المرور' },
+                role: { type: 'string', description: 'الدور (admin, user, sales, viewer)' }
+            },
+            required: ['username', 'full_name', 'email', 'password']
+        }
+    },
+    {
+        name: 'updateUser',
+        description: 'تحديث بيانات مستخدم',
+        parameters: {
+            type: 'object',
+            properties: {
+                id: { type: 'number', description: 'رقم المستخدم' },
+                full_name: { type: 'string', description: 'الاسم الكامل الجديد' },
+                email: { type: 'string', description: 'البريد الجديد' },
+                role: { type: 'string', description: 'الدور الجديد' }
+            },
+            required: ['id']
+        }
+    },
+    {
+        name: 'deleteUser',
+        description: 'حذف مستخدم من النظام',
+        parameters: {
+            type: 'object',
+            properties: {
+                id: { type: 'number', description: 'رقم المستخدم المراد حذفه' }
+            },
+            required: ['id']
+        }
+    },
+    {
+        name: 'getUsers',
+        description: 'عرض جميع المستخدمين أو حسب الدور',
+        parameters: {
+            type: 'object',
+            properties: {
+                role: { type: 'string', description: 'فلترة حسب الدور (اختياري)' }
+            }
+        }
+    },
+    {
+        name: 'assignRole',
+        description: 'تعيين دور لمستخدم',
+        parameters: {
+            type: 'object',
+            properties: {
+                user_id: { type: 'number', description: 'رقم المستخدم' },
+                role: { type: 'string', description: 'الدور الجديد (admin, user, sales, viewer)' }
+            },
+            required: ['user_id', 'role']
+        }
+    },
+
+    // ========== SUPPLIER MANAGEMENT (5 tools) ==========
+    {
+        name: 'addSupplier',
+        description: 'إضافة مورد جديد',
+        parameters: {
+            type: 'object',
+            properties: {
+                name: { type: 'string', description: 'اسم المورد' },
+                contact_person: { type: 'string', description: 'شخص الاتصال' },
+                phone: { type: 'string', description: 'رقم الهاتف' },
+                email: { type: 'string', description: 'البريد الإلكتروني' },
+                address: { type: 'string', description: 'العنوان' }
+            },
+            required: ['name', 'phone']
+        }
+    },
+    {
+        name: 'updateSupplier',
+        description: 'تحديث بيانات مورد',
+        parameters: {
+            type: 'object',
+            properties: {
+                id: { type: 'number', description: 'رقم المورد' },
+                name: { type: 'string', description: 'الاسم الجديد' },
+                contact_person: { type: 'string', description: 'شخص الاتصال الجديد' },
+                phone: { type: 'string', description: 'الهاتف الجديد' },
+                email: { type: 'string', description: 'البريد الجديد' },
+                address: { type: 'string', description: 'العنوان الجديد' }
+            },
+            required: ['id']
+        }
+    },
+    {
+        name: 'deleteSupplier',
+        description: 'حذف مورد من النظام',
+        parameters: {
+            type: 'object',
+            properties: {
+                id: { type: 'number', description: 'رقم المورد المراد حذفه' }
+            },
+            required: ['id']
+        }
+    },
+    {
+        name: 'getSuppliers',
+        description: 'عرض جميع الموردين',
+        parameters: { type: 'object', properties: {} }
+    },
+    {
+        name: 'linkProductToSupplier',
+        description: 'ربط منتج بمورد مع سعر التكلفة',
+        parameters: {
+            type: 'object',
+            properties: {
+                product_id: { type: 'number', description: 'رقم المنتج' },
+                supplier_id: { type: 'number', description: 'رقم المورد' },
+                cost_price: { type: 'number', description: 'سعر التكلفة من المورد' }
+            },
+            required: ['product_id', 'supplier_id']
+        }
+    },
+
+    // ========== COUPON MANAGEMENT (3 tools) ==========
+    {
+        name: 'createCoupon',
+        description: 'إنشاء قسيمة خصم جديدة',
+        parameters: {
+            type: 'object',
+            properties: {
+                code: { type: 'string', description: 'كود القسيمة' },
+                type: { type: 'string', description: 'نوع الخصم (percentage/fixed)' },
+                value: { type: 'number', description: 'قيمة الخصم' },
+                min_order_amount: { type: 'number', description: 'الحد الأدنى لمبلغ الطلب' },
+                expiry_date: { type: 'string', description: 'تاريخ الانتهاء (YYYY-MM-DD)' },
+                usage_limit: { type: 'number', description: 'حد الاستخدام' }
+            },
+            required: ['code', 'type', 'value']
+        }
+    },
+    {
+        name: 'getCoupons',
+        description: 'عرض جميع القسائم',
+        parameters: {
+            type: 'object',
+            properties: {
+                active_only: { type: 'boolean', description: 'عرض النشطة فقط' }
+            }
+        }
+    },
+    {
+        name: 'deleteCoupon',
+        description: 'حذف قسيمة',
+        parameters: {
+            type: 'object',
+            properties: {
+                code: { type: 'string', description: 'كود القسيمة المراد حذفها' }
+            },
+            required: ['code']
+        }
+    },
+
+    // ========== RETURNS & REFUNDS (3 tools) ==========
+    {
+        name: 'processReturn',
+        description: 'تسجيل عملية إرجاع منتج',
+        parameters: {
+            type: 'object',
+            properties: {
+                order_id: { type: 'number', description: 'رقم الطلب' },
+                customer_id: { type: 'number', description: 'رقم العميل' },
+                items: {
+                    type: 'array',
+                    description: 'المنتجات المرتجعة',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            product_id: { type: 'number' },
+                            quantity: { type: 'number' },
+                            unit_price: { type: 'number' }
+                        }
+                    }
+                },
+                reason: { type: 'string', description: 'سبب الإرجاع' }
+            },
+            required: ['order_id', 'customer_id', 'items', 'reason']
+        }
+    },
+    {
+        name: 'issueRefund',
+        description: 'إصدار مبلغ مسترد للعميل',
+        parameters: {
+            type: 'object',
+            properties: {
+                return_id: { type: 'number', description: 'رقم الإرجاع' },
+                amount: { type: 'number', description: 'المبلغ المسترد' },
+                method: { type: 'string', description: 'طريقة الاسترداد (cash, bank_transfer, card)' }
+            },
+            required: ['return_id', 'amount', 'method']
+        }
+    },
+    {
+        name: 'getReturns',
+        description: 'عرض جميع المرتجعات',
+        parameters: {
+            type: 'object',
+            properties: {
+                order_id: { type: 'number', description: 'فلترة حسب رقم الطلب (اختياري)' },
+                status: { type: 'string', description: 'فلترة حسب الحالة (اختياري)' }
             }
         }
     },
@@ -954,6 +1228,452 @@ async function executeFunction(functionName, args) {
                 });
             });
 
+        // ========== CATEGORIES ==========
+        case 'addCategory':
+            return new Promise((resolve, reject) => {
+                const { name, description } = args;
+                database.db.run(
+                    `INSERT INTO categories (name, description) VALUES (?, ?)`,
+                    [name, description || null],
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve({
+                            success: true,
+                            id: this.lastID,
+                            message: `🏷️ تم إضافة الفئة "${name}" بنجاح برقم #${this.lastID}`
+                        });
+                    }
+                );
+            });
+
+        case 'updateCategory':
+            return new Promise((resolve, reject) => {
+                const { id, ...updates } = args;
+                const fields = Object.keys(updates).map(key => `${key} = ?`).join(', ');
+                const values = [...Object.values(updates), id];
+
+                if (fields.length === 0) {
+                    resolve({ success: false, message: '⚠️ لا توجد تحديثات' });
+                    return;
+                }
+
+                database.db.run(
+                    `UPDATE categories SET ${fields} WHERE id = ?`,
+                    values,
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve({
+                            success: true,
+                            changes: this.changes,
+                            message: `✅ تم تحديث الفئة #${id}`
+                        });
+                    }
+                );
+            });
+
+        case 'deleteCategory':
+            return new Promise((resolve, reject) => {
+                database.db.get(
+                    `SELECT COUNT(*) as count FROM products WHERE category_id = ?`,
+                    [args.id],
+                    (err, row) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        if (row.count > 0) {
+                            resolve({
+                                success: false,
+                                message: `⚠️ لا يمكن حذف الفئة! يوجد ${row.count} منتج مرتبط بها.`
+                            });
+                            return;
+                        }
+
+                        database.db.run(`DELETE FROM categories WHERE id = ?`, [args.id], function(err) {
+                            if (err) reject(err);
+                            else resolve({
+                                success: true,
+                                message: `🗑️ تم حذف الفئة #${args.id}`
+                            });
+                        });
+                    }
+                );
+            });
+
+        case 'getCategories':
+            return new Promise((resolve, reject) => {
+                database.db.all(
+                    `SELECT c.*, COUNT(p.id) as products_count
+                     FROM categories c
+                     LEFT JOIN products p ON c.id = p.category_id
+                     GROUP BY c.id
+                     ORDER BY c.id ASC`,
+                    [],
+                    (err, rows) => {
+                        if (err) reject(err);
+                        else resolve({
+                            categories: rows,
+                            count: rows.length,
+                            message: `🏷️ تم العثور على ${rows.length} فئة`
+                        });
+                    }
+                );
+            });
+
+        case 'getProductsByCategory':
+            return new Promise((resolve, reject) => {
+                database.db.all(
+                    `SELECT * FROM products WHERE category_id = ? ORDER BY name ASC`,
+                    [args.category_id],
+                    (err, rows) => {
+                        if (err) reject(err);
+                        else resolve({
+                            products: rows,
+                            count: rows.length,
+                            message: `📦 تم العثور على ${rows.length} منتج في هذه الفئة`
+                        });
+                    }
+                );
+            });
+
+        // ========== USERS ==========
+        case 'addUser':
+            return new Promise(async (resolve, reject) => {
+                const { username, full_name, email, password, role = 'user' } = args;
+                try {
+                    const bcrypt = require('bcrypt');
+                    const hashedPassword = await bcrypt.hash(password, 10);
+
+                    database.db.run(
+                        `INSERT INTO users (username, full_name, email, password, role) VALUES (?, ?, ?, ?, ?)`,
+                        [username, full_name, email, hashedPassword, role],
+                        function(err) {
+                            if (err) reject(err);
+                            else resolve({
+                                success: true,
+                                id: this.lastID,
+                                message: `👤 تم إضافة المستخدم "${full_name}" بنجاح برقم #${this.lastID}`
+                            });
+                        }
+                    );
+                } catch (err) {
+                    reject(err);
+                }
+            });
+
+        case 'updateUser':
+            return new Promise((resolve, reject) => {
+                const { id, ...updates } = args;
+                const fields = Object.keys(updates).map(key => `${key} = ?`).join(', ');
+                const values = [...Object.values(updates), id];
+
+                if (fields.length === 0) {
+                    resolve({ success: false, message: '⚠️ لا توجد تحديثات' });
+                    return;
+                }
+
+                database.db.run(
+                    `UPDATE users SET ${fields} WHERE id = ?`,
+                    values,
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve({
+                            success: true,
+                            changes: this.changes,
+                            message: `✅ تم تحديث المستخدم #${id}`
+                        });
+                    }
+                );
+            });
+
+        case 'deleteUser':
+            return new Promise((resolve, reject) => {
+                database.db.run(`DELETE FROM users WHERE id = ?`, [args.id], function(err) {
+                    if (err) reject(err);
+                    else resolve({
+                        success: true,
+                        changes: this.changes,
+                        message: `🗑️ تم حذف المستخدم #${args.id}`
+                    });
+                });
+            });
+
+        case 'getUsers':
+            return new Promise((resolve, reject) => {
+                const roleFilter = args.role ? `WHERE role = '${args.role}'` : '';
+                database.db.all(
+                    `SELECT id, username, full_name, email, role, created_at FROM users ${roleFilter} ORDER BY id ASC`,
+                    [],
+                    (err, rows) => {
+                        if (err) reject(err);
+                        else resolve({
+                            users: rows,
+                            count: rows.length,
+                            message: `👥 تم العثور على ${rows.length} مستخدم`
+                        });
+                    }
+                );
+            });
+
+        case 'assignRole':
+            return new Promise((resolve, reject) => {
+                database.db.run(
+                    `UPDATE users SET role = ? WHERE id = ?`,
+                    [args.role, args.user_id],
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve({
+                            success: true,
+                            changes: this.changes,
+                            message: `✅ تم تعيين الدور "${args.role}" للمستخدم #${args.user_id}`
+                        });
+                    }
+                );
+            });
+
+        // ========== SUPPLIERS ==========
+        case 'addSupplier':
+            return new Promise((resolve, reject) => {
+                const { name, contact_person, phone, email, address } = args;
+                database.db.run(
+                    `INSERT INTO suppliers (name, contact_person, phone, email, address) VALUES (?, ?, ?, ?, ?)`,
+                    [name, contact_person || null, phone, email || null, address || null],
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve({
+                            success: true,
+                            id: this.lastID,
+                            message: `🚚 تم إضافة المورد "${name}" بنجاح برقم #${this.lastID}`
+                        });
+                    }
+                );
+            });
+
+        case 'updateSupplier':
+            return new Promise((resolve, reject) => {
+                const { id, ...updates } = args;
+                const fields = Object.keys(updates).map(key => `${key} = ?`).join(', ');
+                const values = [...Object.values(updates), id];
+
+                if (fields.length === 0) {
+                    resolve({ success: false, message: '⚠️ لا توجد تحديثات' });
+                    return;
+                }
+
+                database.db.run(
+                    `UPDATE suppliers SET ${fields} WHERE id = ?`,
+                    values,
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve({
+                            success: true,
+                            changes: this.changes,
+                            message: `✅ تم تحديث المورد #${id}`
+                        });
+                    }
+                );
+            });
+
+        case 'deleteSupplier':
+            return new Promise((resolve, reject) => {
+                database.db.run(`DELETE FROM suppliers WHERE id = ?`, [args.id], function(err) {
+                    if (err) reject(err);
+                    else resolve({
+                        success: true,
+                        changes: this.changes,
+                        message: `🗑️ تم حذف المورد #${args.id}`
+                    });
+                });
+            });
+
+        case 'getSuppliers':
+            return new Promise((resolve, reject) => {
+                database.db.all(
+                    `SELECT * FROM suppliers ORDER BY id ASC`,
+                    [],
+                    (err, rows) => {
+                        if (err) reject(err);
+                        else resolve({
+                            suppliers: rows,
+                            count: rows.length,
+                            message: `🚚 تم العثور على ${rows.length} مورد`
+                        });
+                    }
+                );
+            });
+
+        case 'linkProductToSupplier':
+            return new Promise((resolve, reject) => {
+                const { product_id, supplier_id, cost_price } = args;
+                database.db.run(
+                    `INSERT INTO product_suppliers (product_id, supplier_id, cost_price) VALUES (?, ?, ?)`,
+                    [product_id, supplier_id, cost_price || null],
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve({
+                            success: true,
+                            message: `🔗 تم ربط المنتج #${product_id} بالمورد #${supplier_id}`
+                        });
+                    }
+                );
+            });
+
+        // ========== COUPONS ==========
+        case 'createCoupon':
+            return new Promise((resolve, reject) => {
+                const { code, type, value, min_order_amount, expiry_date, usage_limit } = args;
+                database.db.run(
+                    `INSERT INTO coupons (code, type, value, min_order_amount, expiry_date, usage_limit)
+                     VALUES (?, ?, ?, ?, ?, ?)`,
+                    [code, type, value, min_order_amount || 0, expiry_date || null, usage_limit || null],
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve({
+                            success: true,
+                            message: `🎟️ تم إنشاء القسيمة "${code}" بنجاح`
+                        });
+                    }
+                );
+            });
+
+        case 'getCoupons':
+            return new Promise((resolve, reject) => {
+                const activeFilter = args.active_only ? `WHERE is_active = 1` : '';
+                database.db.all(
+                    `SELECT * FROM coupons ${activeFilter} ORDER BY created_at DESC`,
+                    [],
+                    (err, rows) => {
+                        if (err) reject(err);
+                        else resolve({
+                            coupons: rows,
+                            count: rows.length,
+                            message: `🎟️ تم العثور على ${rows.length} قسيمة`
+                        });
+                    }
+                );
+            });
+
+        case 'deleteCoupon':
+            return new Promise((resolve, reject) => {
+                database.db.run(`DELETE FROM coupons WHERE code = ?`, [args.code], function(err) {
+                    if (err) reject(err);
+                    else resolve({
+                        success: true,
+                        message: `🗑️ تم حذف القسيمة "${args.code}"`
+                    });
+                });
+            });
+
+        // ========== RETURNS & REFUNDS ==========
+        case 'processReturn':
+            return new Promise((resolve, reject) => {
+                const { order_id, customer_id, items, reason } = args;
+                const total_amount = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+
+                database.db.run(
+                    `INSERT INTO returns (order_id, customer_id, reason, total_amount) VALUES (?, ?, ?, ?)`,
+                    [order_id, customer_id, reason, total_amount],
+                    function(err) {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        const return_id = this.lastID;
+                        const stmt = database.db.prepare(
+                            `INSERT INTO return_items (return_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)`
+                        );
+
+                        items.forEach(item => {
+                            const subtotal = item.quantity * item.unit_price;
+                            stmt.run([return_id, item.product_id, item.quantity, item.unit_price, subtotal]);
+                            // Return stock
+                            database.db.run(
+                                `UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?`,
+                                [item.quantity, item.product_id]
+                            );
+                        });
+
+                        stmt.finalize();
+                        resolve({
+                            success: true,
+                            return_id,
+                            message: `↩️ تم تسجيل الإرجاع #${return_id} بمبلغ ${total_amount} ريال`
+                        });
+                    }
+                );
+            });
+
+        case 'issueRefund':
+            return new Promise((resolve, reject) => {
+                const { return_id, amount, method } = args;
+
+                // Get return details first
+                database.db.get(
+                    `SELECT order_id, customer_id FROM returns WHERE id = ?`,
+                    [return_id],
+                    (err, returnData) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        database.db.run(
+                            `INSERT INTO refunds (return_id, order_id, customer_id, amount, method, status, processed_date)
+                             VALUES (?, ?, ?, ?, ?, 'completed', datetime('now'))`,
+                            [return_id, returnData.order_id, returnData.customer_id, amount, method],
+                            function(err) {
+                                if (err) reject(err);
+                                else {
+                                    // Update return with refund amount
+                                    database.db.run(
+                                        `UPDATE returns SET refund_amount = ?, status = 'completed' WHERE id = ?`,
+                                        [amount, return_id]
+                                    );
+                                    resolve({
+                                        success: true,
+                                        refund_id: this.lastID,
+                                        message: `💰 تم إصدار استرداد بمبلغ ${amount} ريال عبر ${method}`
+                                    });
+                                }
+                            }
+                        );
+                    }
+                );
+            });
+
+        case 'getReturns':
+            return new Promise((resolve, reject) => {
+                let query = `SELECT r.*, c.name as customer_name FROM returns r
+                            LEFT JOIN customers c ON r.customer_id = c.id`;
+                const params = [];
+                const conditions = [];
+
+                if (args.order_id) {
+                    conditions.push('r.order_id = ?');
+                    params.push(args.order_id);
+                }
+                if (args.status) {
+                    conditions.push('r.status = ?');
+                    params.push(args.status);
+                }
+
+                if (conditions.length > 0) {
+                    query += ' WHERE ' + conditions.join(' AND ');
+                }
+                query += ' ORDER BY r.created_at DESC';
+
+                database.db.all(query, params, (err, rows) => {
+                    if (err) reject(err);
+                    else resolve({
+                        returns: rows,
+                        count: rows.length,
+                        message: `↩️ تم العثور على ${rows.length} إرجاع`
+                    });
+                });
+            });
+
         default:
             return { error: 'Unknown function', message: '❌ وظيفة غير معروفة' };
     }
@@ -968,36 +1688,84 @@ async function chat(message, conversationHistory = []) {
             tools: [{
                 functionDeclarations: tools
             }],
-            systemInstruction: `أنت مساعد AI متقدم لنظام إدارة المبيعات - لديك سيطرة كاملة على النظام بالكامل! 🚀
+            systemInstruction: `أنت مساعد AI متقدم جداً لنظام إدارة المبيعات - لديك سيطرة كاملة 100% على النظام! 🚀
 
-🎯 **صلاحياتك الكاملة:**
-- إدارة العملاء: إضافة، تعديل، حذف، بحث
-- إدارة المنتجات: إضافة، تعديل، حذف، بحث، تحديث المخزون، تحديث الأسعار
-- إدارة الطلبات: إنشاء، تعديل، حذف، بحث، عرض التفاصيل
-- التقارير والإحصائيات: إيرادات، أفضل المنتجات، أفضل العملاء
-- عمليات النظام: مسح البيانات، عرض معلومات النظام
+🎯 **صلاحياتك الكاملة (48 أداة):**
 
-💡 **إرشادات مهمة:**
-1. تحدث باللغة العربية دائماً
-2. كن ودوداً ومحترفاً في ردودك
-3. استخدم الإيموجي لتوضيح الرسائل
-4. عند الطلب، استخدم الأدوات المتاحة فوراً
-5. اشرح ما فعلته بوضوح
-6. إذا كانت العملية خطرة (حذف)، حذر المستخدم
-7. قدم اقتراحات مفيدة بعد كل عملية
-8. عند البحث، اعرض النتائج بشكل منظم
+1️⃣ **إدارة الفئات (5 أدوات):**
+   - إضافة، تعديل، حذف فئات المنتجات
+   - عرض جميع الفئات مع عدد المنتجات
+   - عرض منتجات فئة معينة
 
-🔒 **التأكيدات الأمنية:**
-- للعمليات الخطرة (مثل clearAllData)، اطلب تأكيد صريح
-- تحقق من المعاملات المالية قبل الحفظ
-- نبه عند انخفاض المخزون
+2️⃣ **إدارة العملاء (6 أدوات):**
+   - إضافة، تعديل، حذف عملاء
+   - البحث عن العملاء
+   - عرض طلبات عميل معين
 
-📊 **عرض البيانات:**
-- رتب المعلومات بشكل جميل
-- استخدم الأرقام والإحصائيات
-- قدم رؤى وملاحظات مفيدة
+3️⃣ **إدارة المنتجات (8 أدوات):**
+   - إضافة، تعديث، حذف منتجات
+   - البحث في المنتجات
+   - تحديث المخزون (+ أو -)
+   - عرض منتجات قليلة المخزون
+   - تحديث أسعار بالجملة (نسبة %)
 
-أنت الآن جاهز للسيطرة الكاملة على النظام! 💪`
+4️⃣ **إدارة الطلبات (7 أدوات):**
+   - إنشاء، تعديل، حذف طلبات
+   - البحث وعرض تفاصيل الطلبات
+   - تطبيق قسائم الخصم على الطلبات
+
+5️⃣ **إدارة المستخدمين (5 أدوات):**
+   - إضافة، تعديل، حذف مستخدمين
+   - عرض المستخدمين حسب الدور
+   - تعيين أدوار (admin, user, sales, viewer)
+
+6️⃣ **إدارة الموردين (5 أدوات):**
+   - إضافة، تعديل، حذف موردين
+   - عرض جميع الموردين
+   - ربط منتجات بموردين مع أسعار التكلفة
+
+7️⃣ **إدارة القسائم (3 أدوات):**
+   - إنشاء قسائم خصم (percentage/fixed)
+   - عرض وحذف القسائم
+   - تطبيق القسائم على الطلبات
+
+8️⃣ **إدارة المرتجعات والاستردادات (3 أدوات):**
+   - تسجيل إرجاع منتجات (تحديث مخزون تلقائي)
+   - إصدار مبالغ مستردة
+   - عرض جميع المرتجعات
+
+9️⃣ **التقارير والإحصائيات (4 أدوات):**
+   - إحصائيات شاملة للوحة التحكم
+   - تقارير الإيرادات حسب الفترة
+   - أفضل المنتجات مبيعاً
+   - أفضل العملاء
+
+🔟 **عمليات النظام (2 أداة):**
+   - مسح جميع البيانات (مع تأكيد)
+   - عرض معلومات النظام الكاملة
+
+💡 **إرشادات التعامل:**
+1. تحدث باللغة العربية دائماً واستخدم الإيموجي
+2. كن ودوداً ومحترفاً وواضحاً
+3. استخدم الأدوات المتاحة فوراً عند الطلب
+4. اشرح ما فعلته بوضوح مع الأرقام
+5. للعمليات الخطرة (حذف، مسح)، حذّر المستخدم
+6. قدم اقتراحات مفيدة بعد كل عملية
+7. نبه عند انخفاض المخزون أو مشاكل محتملة
+8. رتب المعلومات بشكل جميل ومنظم
+
+🔒 **الأمان:**
+- اطلب تأكيد صريح قبل حذف أي بيانات
+- تحقق من صحة المعاملات المالية
+- نبه عند ربط أو حذف بيانات مرتبطة ببيانات أخرى
+
+✨ **مميزات ذكية:**
+- المخزون يتحدث تلقائياً مع الطلبات والمرتجعات
+- الخصومات تُحسب تلقائياً عند تطبيق القسائم
+- التقارير مفصلة بالتواريخ والفلترة
+- البحث متاح في كل الجداول
+
+أنت الآن تمتلك سيطرة كاملة 100% على كل شي في النظام! 💪🔥`
         });
 
         // Build chat with history

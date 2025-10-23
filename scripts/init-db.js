@@ -160,6 +160,121 @@ async function initializeDatabase() {
       )
     `);
 
+    // جدول الموردين
+    await db.run(`
+      CREATE TABLE IF NOT EXISTS suppliers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        contact_person TEXT,
+        phone TEXT NOT NULL,
+        email TEXT,
+        address TEXT,
+        city TEXT,
+        country TEXT,
+        payment_terms TEXT,
+        notes TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // جدول ربط المنتجات بالموردين
+    await db.run(`
+      CREATE TABLE IF NOT EXISTS product_suppliers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        product_id INTEGER NOT NULL,
+        supplier_id INTEGER NOT NULL,
+        cost_price REAL,
+        is_primary INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+        FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE CASCADE
+      )
+    `);
+
+    // جدول القسائم والخصومات
+    await db.run(`
+      CREATE TABLE IF NOT EXISTS coupons (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code TEXT UNIQUE NOT NULL,
+        type TEXT NOT NULL,
+        value REAL NOT NULL,
+        min_order_amount REAL DEFAULT 0,
+        max_discount REAL,
+        usage_limit INTEGER,
+        usage_count INTEGER DEFAULT 0,
+        product_id INTEGER,
+        category_id INTEGER,
+        expiry_date DATETIME,
+        is_active INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (product_id) REFERENCES products(id),
+        FOREIGN KEY (category_id) REFERENCES categories(id)
+      )
+    `);
+
+    // جدول المرتجعات
+    await db.run(`
+      CREATE TABLE IF NOT EXISTS returns (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER NOT NULL,
+        customer_id INTEGER NOT NULL,
+        return_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+        status TEXT DEFAULT 'pending',
+        reason TEXT,
+        total_amount REAL DEFAULT 0,
+        refund_amount REAL DEFAULT 0,
+        refund_method TEXT,
+        notes TEXT,
+        processed_by INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (order_id) REFERENCES orders(id),
+        FOREIGN KEY (customer_id) REFERENCES customers(id),
+        FOREIGN KEY (processed_by) REFERENCES users(id)
+      )
+    `);
+
+    // جدول تفاصيل المرتجعات
+    await db.run(`
+      CREATE TABLE IF NOT EXISTS return_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        return_id INTEGER NOT NULL,
+        product_id INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        unit_price REAL NOT NULL,
+        subtotal REAL NOT NULL,
+        condition TEXT,
+        notes TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (return_id) REFERENCES returns(id) ON DELETE CASCADE,
+        FOREIGN KEY (product_id) REFERENCES products(id)
+      )
+    `);
+
+    // جدول المبالغ المستردة
+    await db.run(`
+      CREATE TABLE IF NOT EXISTS refunds (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        return_id INTEGER NOT NULL,
+        order_id INTEGER NOT NULL,
+        customer_id INTEGER NOT NULL,
+        amount REAL NOT NULL,
+        method TEXT NOT NULL,
+        reference_number TEXT,
+        status TEXT DEFAULT 'pending',
+        processed_date DATETIME,
+        notes TEXT,
+        processed_by INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (return_id) REFERENCES returns(id),
+        FOREIGN KEY (order_id) REFERENCES orders(id),
+        FOREIGN KEY (customer_id) REFERENCES customers(id),
+        FOREIGN KEY (processed_by) REFERENCES users(id)
+      )
+    `);
+
     console.log('تم إنشاء جميع الجداول بنجاح!');
 
     // إنشاء مستخدم افتراضي
@@ -228,6 +343,24 @@ async function initializeDatabase() {
         await db.run(
           'INSERT INTO products (name, description, category_id, price, cost, sku, barcode, stock_quantity, min_stock_level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
           product
+        );
+      } catch (err) {
+        // تجاهل الأخطاء إذا كانت البيانات موجودة
+      }
+    }
+
+    // إضافة موردين تجريبيين
+    const suppliers = [
+      ['شركة التقنية المتقدمة', 'أحمد السالم', '0501111111', 'tech@example.com', 'شارع الملك عبدالعزيز', 'الرياض', 'السعودية', 'دفع عند الاستلام', 'مورد أساسي للإلكترونيات'],
+      ['مؤسسة الملابس الحديثة', 'سارة محمد', '0502222222', 'clothes@example.com', 'شارع التحلية', 'جدة', 'السعودية', 'آجل 30 يوم', 'مورد الملابس'],
+      ['شركة الأثاث الفاخر', 'خالد عبدالله', '0503333333', 'furniture@example.com', 'طريق الملك فهد', 'الدمام', 'السعودية', 'نقدي', 'مورد الأثاث']
+    ];
+
+    for (const supplier of suppliers) {
+      try {
+        await db.run(
+          'INSERT INTO suppliers (name, contact_person, phone, email, address, city, country, payment_terms, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          supplier
         );
       } catch (err) {
         // تجاهل الأخطاء إذا كانت البيانات موجودة
