@@ -173,6 +173,70 @@
         </div>
     </div>
 
+    <!-- AI Assistant Chat -->
+    <div id="ai-chat-container" class="ai-chat-container" style="display: none;">
+        <div class="ai-chat-header">
+            <div class="ai-header-content">
+                <svg class="ai-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <div>
+                    <h3>AI Assistant</h3>
+                    <span class="ai-status">مدعوم بـ Gemini 2.0 Flash</span>
+                </div>
+            </div>
+            <button class="ai-close-btn" onclick="toggleAIChat()">×</button>
+        </div>
+        <div class="ai-chat-messages" id="ai-chat-messages">
+            <div class="ai-message ai-message-bot">
+                <div class="ai-message-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </div>
+                <div class="ai-message-content">
+                    مرحباً! أنا مساعدك الذكي المدعوم بـ Gemini AI. يمكنني مساعدتك في:
+                    <ul>
+                        <li>إضافة العملاء والمنتجات والطلبات</li>
+                        <li>عرض وتحديث البيانات</li>
+                        <li>حذف السجلات</li>
+                        <li>عرض الإحصائيات</li>
+                    </ul>
+                    فقط أخبرني بما تريد! 🚀
+                </div>
+            </div>
+        </div>
+        <div class="ai-chat-input-container">
+            <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="اكتب رسالتك هنا...">
+            <button class="ai-send-btn" onclick="sendAIMessage()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Floating Button -->
+    <button class="ai-floating-btn" onclick="toggleAIChat()" title="AI Assistant">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+        </svg>
+        <span class="ai-pulse"></span>
+    </button>
+
     <script src="/js/app.js"></script>
+    <script src="/js/ai-chat.js"></script>
 </body>
 </html>
